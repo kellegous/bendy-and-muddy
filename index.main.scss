@@ -1,0 +1,651 @@
+// Controls the flipping of the cover
+@-webkit-keyframes flip-cover {
+  0% {
+    -webkit-transform: perspective(6000px) rotateY(0deg);
+  }
+  100% {
+    -webkit-transform: perspective(6000px) rotateY(-180deg);
+  }
+}
+@-moz-keyframes flip-cover {
+  0% {
+    -moz-transform: perspective(6000px) rotateY(0deg);
+  }
+  100% {
+    -moz-transform: perspective(6000px) rotateY(-180deg);
+  }
+}
+
+// Controls the shrinking and fading of the faux shadow cast
+// on the right pages as the cover opens and closes.
+@-webkit-keyframes flip-shadow {
+  0% {
+    opacity: 0.2;
+    width: 830px;
+  }
+  30% {
+    opacity: 0.2;
+    width: 830px;
+  }
+  50% {
+    opacity: 0;
+    width: 200px;
+  }
+  100% {
+    opacity: 0;
+    width: 200px;
+  }
+}
+@-moz-keyframes flip-shadow {
+  0% {
+    opacity: 0.2;
+    width: 830px;
+  }
+  30% {
+    opacity: 0.2;
+    width: 830px;
+  }
+  50% {
+    opacity: 0;
+    width: 200px;
+  }
+  100% {
+    opacity: 0;
+    width: 200px;
+  }
+}
+
+// A general class for reversing any keyframe based animation
+.reversed {
+  -webkit-animation-direction: reverse;
+  -moz-animation-direction: reverse;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  background-color: #eee;
+  font-size: 26px;
+  font-family: 'Indie Flower', cursive;
+  color: #444;
+  background-image: url("heart.svg");
+  background-size: 269px 246px;
+  background-position: center (150px + 520px/2 - 246px/2);
+  background-repeat: no-repeat;
+}
+
+header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border-bottom: 1px solid #eee;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+  z-index: 400;
+
+  >.ctrl {
+    position: relative;
+    width: 830px;
+    height: 45px;
+    margin: 0 auto;
+  }
+
+  button {
+    position: absolute;
+    top: 10px;
+    width: 25px;
+    height: 25px;
+    background-size: 25px 25px;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    opacity: 0.2;
+
+    -webkit-transition: opacity 0.2s ease-in-out;
+    -moz-transition: opacity 0.2s ease-in-out;
+
+    >div {
+      pointer-events: none;
+      position: absolute;
+      top: 0;
+      line-height: 25px;
+      font-family: Georgia,serif;
+      font-size: 16px;
+      opacity: 0.0;
+      color: #999;
+    }
+
+    &:hover {
+      opacity: 0.7;
+      >div {
+        opacity: 1.0;
+      }
+    }
+
+    &[disabled] {
+      opacity: 0.05;
+    }
+  }
+
+  #prev {
+    left: 0;
+    background-image: url("arrl.svg");
+    >div {
+      left: 35px;
+    }
+  }
+
+  #next {
+    right: 0;
+    background-image: url("arrr.svg");
+    >div {
+      right: 35px;
+    }
+  }
+
+  #clos {
+    left: 830px/2 - 25px/2;
+    background-image: url("book.svg");
+    >div {
+      left: 35px;
+    }
+  }
+}
+
+#veil {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 60px;
+  background: -webkit-linear-gradient(0deg, rgba(255,255,255,0.9),
+    rgba(255,255,255,0.9) 20%,
+    rgba(255,255,255,0));
+  background: -moz-linear-gradient(0deg, rgba(255,255,255,0.9),
+    rgba(255,255,255,0.9) 20%,
+    rgba(255,255,255,0));
+  z-index: 200;
+}
+
+#book {
+  position: absolute;
+  left: -400px;
+  top: 150px;
+  width: 830px * 2;
+  height: 520px;
+  display: none;
+
+  section {
+    position: absolute;
+    left: 0;
+    top: 10px;
+    background: url("right-page-paper.jpg") no-repeat 0 0;
+    overflow: hidden;
+    >div {
+      margin: 35px 45px;
+      width: 800px - 2 * 45px;
+      height: 500px - 2 * 35px;
+    }
+
+    >.num {
+      position: absolute;
+      left: 770px;
+      bottom: 15px;
+      font-size: 10px;
+      color: #999;
+      font-family: Georgia,serif;
+    }
+  }
+}
+
+#book-shadow {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 830px;
+  bottom: 0;
+  box-shadow: 6px 6px 8px rgba(0,0,0,0.2);
+
+  -webkit-transition: width 500ms ease-in-out;
+  -moz-transition: width 500ms ease-in-out;
+
+  &.open {
+    width: 830px * 2;
+  }
+}
+
+$cover-duration: 1.2s;
+
+#rcover-shadow {
+  position: absolute;
+  left: 830px;
+  top: 0;
+  width: 830px;
+  height: 520px;
+  background-color: #000;
+  z-index: 101;
+  &.flipped {
+    -webkit-animation-name: flip-shadow;
+    -webkit-animation-fill-mode: both;
+    -webkit-animation-timing-function: ease-in-out;
+    -webkit-animation-duration: $cover-duration;
+
+    -moz-animation-name: flip-shadow;
+    -moz-animation-fill-mode: both;
+    -moz-animation-timing-function: ease-in-out;
+    -moz-animation-duration: $cover-duration;
+  }
+}
+
+#rcover {
+  position: absolute;
+  left: 830px;
+  top: 0;
+  width: 830px;
+  height: 520px;
+  -webkit-transform-origin: left center;
+  -webkit-transform-style: preserve-3d;
+  -webkit-transform: rotateY(0deg);
+
+  -moz-transform-origin: left center;
+  -moz-transform-style: preserve-3d;
+  -moz-transform: rotateY(0deg);
+
+  z-index: 102;
+
+  &.flipped {
+    -webkit-animation-name: flip-cover;
+    -webkit-animation-timing-function: ease-in-out;
+    -webkit-animation-fill-mode: both;
+    -webkit-animation-duration: $cover-duration;
+
+    -moz-animation-name: flip-cover;
+    -moz-animation-timing-function: ease-in-out;
+    -moz-animation-fill-mode: both;
+    -moz-animation-duration: $cover-duration;
+  }
+
+  >.face, >.rear {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+  >.face {
+    background: url("front-cover.jpg") no-repeat 0 0;
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    cursor: pointer;
+    z-index: 50;
+  }
+  >.rear {
+    background: url("left-page.jpg") no-repeat 0 0;
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: rotateY(180deg);
+    -moz-backface-visibility: hidden;
+    -moz-transform: rotateY(180deg);
+  }
+  >.side {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    background-color: #cf746f;
+    -webkit-transform: rotateY(90deg);
+    -moz-transform: rotateY(90deg);
+  }
+}
+
+#lpages {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 830px;
+  height: 520px;
+  background: url("left-page.jpg") no-repeat 0 0;
+  display: none;
+}
+
+#rpages {
+  position: absolute;
+  left: 830px;
+  top: 0;
+  width: 830px;
+  height: 520px;
+  background: url("right-page.jpg") no-repeat 0 0;
+  cursor: pointer;
+}
+
+#stack {
+  position: absolute;
+  left: 800px;
+  top: 10px;
+  width: 30px;
+  height: 500px;
+
+  >div {
+    position: absolute;
+    opacity: 1;
+    left: 0;
+    -webkit-transition: opacity 1s ease-in-out;
+    -moz-transition: opacity 1s ease-in-out;
+  }
+  >.s0 {
+    width: 1px;
+    background-color: #b6d6d6;
+    top: 0;
+    bottom: 0;
+  }
+  >.s1 {
+    width: 2px;
+    top: 1px;
+    bottom: 1px;
+    background-color: #c8c9c9;
+  }
+  >.s2 {
+    width: 3px;
+    top: 2px;
+    bottom: 2px;
+    background-color: #d6d6d6;
+  }
+  >.s3 {
+    width: 4px;
+    top: 3px;
+    bottom: 3px;
+    background-color: #c8c9c9;
+  }
+  >.s4 {
+    width: 5px;
+    top: 4px;
+    bottom: 4px;
+    background-color: #d6d6d6;
+  }
+}
+
+#flip {
+  position: absolute;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.img {
+  position: absolute;
+  box-shadow: 2px 1px 3px rgba(0,0,0,0.2);
+  background-repeat: no-repeat;
+  background-position: center center;
+  >.tul, >.tlr {
+    position: absolute;
+    width: 40px;
+    height: 41px;
+    background-size: 40px 41px;
+    background-repeat: no-repeat;
+  }
+  >.tul {
+    top: -6px;
+    left: -6px;
+    background-image: url("tapeul.png");
+  }
+  >.tlr {
+    bottom: -6px;
+    right: -6px;
+    background-image: url("tapelr.png");
+  }
+}
+.txt {
+  position: absolute;
+  white-space: nowrap;
+  text-shadow: 1px 1px 0px #fff;
+}
+
+// Page #1
+#p00 {
+  top: 50px;
+  left: 120px;
+  width: 250px;
+  height: 333px;
+  background-image: url("i/001.jpg");
+  background-size: 250px 333px;
+  -webkit-transform: rotate(1deg);
+  -moz-transform: rotate(1deg);
+}
+#p01 {
+  top: 55px;
+  left: 480px;
+  width: 250px;
+  height: 333px;
+  background-image: url("i/002.jpg");
+  background-size: 250px 333px;
+  -webkit-transform: rotate(-2deg);
+  -moz-transform: rotate(-2deg);
+}
+#t0 {
+  bottom: 50px;
+  left: 130px;
+  -webkit-transform: rotate(1deg);
+  -moz-transform: rotate(1deg);
+}
+#t01 {
+  display: inline-block;
+  -webkit-transform: translate(4px, 2px) rotate(-2deg);
+  -moz-transform: translate(4px, 2px) rotate(-2deg);
+}
+
+// Page #2
+#p10 {
+  top: 50px;
+  left: 120px;
+  width: 250px;
+  height: 333px;
+  background-image: url("i/003.jpg");
+  background-size: 250px 333px;
+  -webkit-transform: rotate(0deg);
+  -moz-transform: rotate(0deg);
+}
+#p11 {
+  top: 52px;
+  left: 485px;
+  width: 250px;
+  height: 333px;
+  background-image: url("i/004.jpg");
+  background-size: 250px 333px;
+  -webkit-transform: rotate(-2deg);
+  -moz-transform: rotate(-2deg);  
+}
+#t1 {
+  bottom: 65px;
+  left: 100px;
+}
+#t11 {
+  -webkit-transform: rotate(1deg) translate(-160px, 40px);
+  -moz-transform: rotate(1deg) translate(-160px, 40px);
+  display: inline-block;
+}
+
+// Page #3
+#p2 {
+  top: 30px;
+  left: 150px;
+  width: 500px;
+  height: 375px;
+  background-image: url("i/005.jpg");
+  background-size: 500px 375px;
+  -webkit-transform: rotate(-0.5deg);
+  -moz-transform: rotate(-0.5deg);
+}
+#t2 {
+  bottom: 45px;
+  left: 100px;
+}
+#t21 {
+  -webkit-transform: rotate(-1deg) translate(-84px, 23px);
+  -moz-transform: rotate(-1deg) translate(-84px, 23px);
+  display: inline-block;
+}
+
+// Page #4
+#p3 {
+  top: 48px;
+  left: 112px;
+  width: 263px;
+  height: 350px;
+  background-image: url("i/006.jpg");
+  background-size: 263px 350px;
+  -webkit-transform: rotate(1.5deg);
+  -moz-transform: rotate(1.5deg);
+}
+#t3 {
+  top: 120px;
+  left: 405px;
+}
+
+#p4 {
+  top: 35px;
+  left: 150px;
+  width: 500px;
+  height: 375px;
+  background-image: url("i/007.jpg");
+  background-size: 500px 375px;
+}
+#t4 {
+  bottom: 30px;
+  left: 120px;
+}
+
+#p5 {
+  top: 48px;
+  left: 400px;
+  width: 300px;
+  height: 400px;
+  background-image: url("i/008.jpg");
+  background-size: 300px 400px;
+  -webkit-transform: rotate(1.5deg);
+  -moz-transform: rotate(1.5deg);
+}
+#t5 {
+  left: 100px;
+  top: 120px;
+  font-size: 120%;
+  text-align: center;
+  -webkit-transform: rotate(-3deg);
+  -moz-transform: rotate(-3deg);
+}
+
+#p6 {
+  top: 40px;
+  left: 180px;
+  width: 475px;
+  height: 356px;
+  background-image: url("i/009.jpg");
+  background-size: 475px 356px;
+  -webkit-transform: rotate(1deg);
+  -moz-transform: rotate(1deg);
+}
+#t6 {
+  bottom: 22px;
+  left: 200px;
+}
+#t61 {
+  display: block;
+  -webkit-transform: translate(-20px, 5px);
+  -moz-transform: translate(-20px, 5px);
+}
+
+#p7 {
+  top: 48px;
+  left: 112px;
+  width: 450px;
+  height: 388px;
+  background-image: url("i/010.jpg");
+  background-size: 450px 388px;
+  -webkit-transform: rotate(0.5deg);
+  -moz-transform: rotate(0.5deg);
+}
+#t7 {
+  left: 585px;
+  top: 120px;
+}
+
+#p8 {
+  top: 25px;
+  left: 150px;
+  width: 500px;
+  height: 375px;
+  background-image: url("i/011.jpg");
+  background-size: 500px 375px;
+  -webkit-transform: rotate(-1deg);
+  -moz-transform: rotate(-1deg);
+}
+#t8 {
+  bottom: 30px;
+  left: 230px;
+  -webkit-transform: rotate(-1deg);
+  -moz-transform: rotate(-1deg);
+}
+
+#tc0 {
+  padding-top: 100px;
+  font-size: 42px;
+  text-align: center;
+}
+#tc1 {
+  font-size: 18px;
+  text-align: center;
+  font-weight: bold;
+}
+
+#t9 {
+  padding-top: 100px;
+  font-size: 36px;
+  text-align: center;
+}
+
+#credits {
+  position: absolute;
+  font-family: Georgia,serif;
+  position: absolute;
+  left: 0;
+  top: 10px;
+  padding: 90px 200px;
+  width: 800px - 2 * 200px;
+  height: 500px - 2 * 90px;
+  font-size: 16px;
+  text-shadow: 2px 2px 0 #fff;
+  color: #999;
+
+  >.head {
+    text-align: center;
+    >span {
+      padding: 0 20px;
+      background-color: #fcfcfc;
+      font-weight: bold;
+    }
+  }
+
+  >hr {
+    margin-top: -0.5em;
+    border-color: #fff;
+  }
+
+  >.role {
+    float: left;
+    width: (800px - 2 * 200px) / 2;
+    margin-top: 30px;
+    text-align: center;
+
+    &.last {
+      width: 800px - 2 * 200px;
+    }
+
+    >.name {
+      font-weight: bold;
+    }
+
+    >.list {
+    }
+  }
+}
