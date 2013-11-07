@@ -1,0 +1,59 @@
+#!/usr/bin/env python2.7
+
+import optparse
+import os
+import shutil
+import subprocess
+import sys
+
+def run(cmd, cwd):
+  p = subprocess.Popen(cmd, stdout=subprocess.PIPE, cwd=cwd)
+  stdout, _ = p.communicate()
+  return stdout, p.returncode == 0
+
+def find_url(opts, root):
+  if opts.url is not None:
+    return opts.url
+  f = os.path.join(root, 'origin')
+  if os.path.exists(f):
+    with open(f, 'r') as r:
+      return r.read().strip()
+  if os.path.exists(os.path.join(root, '.git')):
+    url, ok = run(['git', 'config', '--get', 'remote.origin.url'], root)
+    if ok:
+      return url.strip()
+
+def main():
+  root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+  parser = optparse.OptionParser()
+  parser.add_option('--url', dest='url', help='')
+  opts, args = parser.parse_args()
+
+  # determine the origin url
+  url = find_url(opts, root)
+  if url is None:
+    sys.stderr.write('unable to find url\n')
+    return 1
+
+  # backup to the parent directory
+  pard = os.path.abspath(os.path.join(root, '..'))
+  os.chdir(pard)
+
+  # remove the repo completely
+  shutil.rmtree(root)
+
+  # clone a new repo at HEAD
+  if subprocess.call(['git', 'clone', url]) != 0:
+    return 1
+
+  # mark the working directory with the origin
+  with open(os.path.join(root, 'origin'), 'w') as w:
+    w.write('%s\n' % url)
+
+  # remove the git repo
+  shutil.rmtree(os.path.join(root, '.git'))
+
+  return 0
+
+if __name__ == '__main__':
+  sys.exit(main())
