@@ -1,5 +1,5 @@
-/// <reference path="jquery.d.ts" />
-/// <reference path="raf.ts" />
+/// <reference path="lib/jquery.d.ts" />
+/// <reference path="lib/raf.ts" />
 module app {
 
 interface Flip {
